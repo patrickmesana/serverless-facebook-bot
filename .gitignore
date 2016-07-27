@@ -41,3 +41,10 @@ admin.env
 
 #Ignore _meta folder
 _meta
+
+#project specifics
+constants.js
+bot-dialog.js
+
+#logs
+logs.txt

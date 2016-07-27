@@ -9,5 +9,10 @@
     "type": "git",
     "url": "git://github.com/"
   },
-  "dependencies": {}
+  "dependencies": {
+    "joi": "^8.0.5",
+    "lodash": "^4.11.1",
+    "node-wit": "^4.0.0",
+    "request": "^2.74.0"
+  }
 }
