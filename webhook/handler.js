@@ -28,26 +28,12 @@ function callSendAPI(messageData, context) {
     qs: { access_token: PAGE_ACCESS_TOKEN },
     method: 'POST',
     json: messageData
-  }, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      var recipientId = body.recipient_id;
-      var messageId = body.message_id;
-
-      console.log("Successfully sent generic message with id %s to recipient %s",
-          messageId, recipientId);
-    } else {
-      console.error("Unable to send message.");
-      console.error(response);
-      console.error(error);
-    }
-    context.done(null);
   });
 }
 
 function sendTextMessage(recipientId, messageText, context) {
 
-    var dialogText = dialog[messageText] ? dialog[messageText] : dialog.help;
-    if (_.isFunction(dialogText)) dialogText = dialogText();
+    var dialogText = dialog(messageText);
 
     var messageData = {
     recipient: {
@@ -82,30 +68,7 @@ function receivedMessage(event, context) {
     // If we receive a text message, check to see if it matches any special
     // keywords and send back the corresponding example. Otherwise, just echo
     // the text we received.
-    switch (messageText) {
-      case 'image':
-        //sendImageMessage(senderID);
-        throw new Error('image message not implemented');
-        break;
-
-      case 'button':
-        // sendButtonMessage(senderID);
-        throw new Error('button message not implemented');
-        break;
-
-      case 'generic':
-        // sendGenericMessage(senderID);
-        throw new Error('generic message not implemented');
-        break;
-
-      case 'receipt':
-        // sendReceiptMessage(senderID);
-        throw new Error('receipt message not implemented');
-        break;
-
-      default:
-        return sendTextMessage(senderID, messageText);
-    }
+    return sendTextMessage(senderID, messageText);
   } else if (messageAttachments) {
     return sendTextMessage(senderID, "Message with attachment received");
   }
@@ -121,20 +84,21 @@ function postRequest(event, context) {
         data.entry.forEach(function (pageEntry) {
             var pageID = pageEntry.id;
             var timeOfEvent = pageEntry.time;
-
+            console.log(JSON.stringify(pageEntry));
             // Iterate over each messaging event
             pageEntry.messaging.forEach(function (messagingEvent) {
+
                 if (messagingEvent.optin) {
                     //receivedAuthentication(messagingEvent);
-                    throw new Error('optin not impletmented');
+                    console.log('optin not impletmented');
                 } else if (messagingEvent.message) {
                     receivedMessage(messagingEvent, context);
                 } else if (messagingEvent.delivery) {
                     //receivedDeliveryConfirmation(messagingEvent);
-                    throw new Error('delivery not impletmented');
+                    console.log('delivered not implemented')
                 } else if (messagingEvent.postback) {
                     //receivedPostback(messagingEvent);
-                    throw new Error('postback not impletmented');
+                    console.log('postback not impletmented');
                 } else {
                     console.log("Webhook received unknown messagingEvent: ", messagingEvent);
                 }
@@ -148,4 +112,5 @@ module.exports.handler = function(event, context) {
     if (event.httpMethod === 'GET')  return context.done(null, getRequest(event, context));
     else if (event.httpMethod === 'POST') return postRequest(event, context);
     else throw new Error('Unknown route');
+    context.done(null);
 };
